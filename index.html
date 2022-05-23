@@ -41,6 +41,16 @@
                             <h4 class="text-primary">Chat System with Nodejs Socket.io and Vuejs</h4>
                         </div>
                         <div id="chat" class="card-body">
+                            <ul>
+                                <li v-for="message in messages" :key="message.id">
+                                    <div class="text-right" v-if="message.sender == username">
+                                        you:  {{message.message}}
+                                    </div>
+                                    <div class="text-left" v-else>
+                                        {{message.sender}}{{message.message}}
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                         <form @submit.prevent="sendMessage()">
                             <div class="input-group">
@@ -113,10 +123,12 @@
                     var message = this.message;
                     var sender = this.username;
                     var info = {
+                        id: Math.floor(Math.random()*244567895343),        // we must have a random number for id
                         sender: sender,
                         message: message
                     };
                     socket.emit("sendMessageClient", info);      // The client is sending the message. The server will receive the message.
+                    this.message = "";
                 }
             }
        
