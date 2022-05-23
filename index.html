@@ -28,8 +28,8 @@
                         </div>
                         <div id="users" class="card-body">
                             <ul class="list-group">
-                                <li class="list-group-item">
-
+                                <li class="list-group-item" v-for="user in users" :key="user.id">
+                                    {{user.name}}
                                 </li>
                             </ul>
                         </div>
@@ -54,12 +54,12 @@
                                 <h4 class="text-center text-primary">Login</h4>
                             </div>
                             <div class="card-body">
-                                <form>
+                                <form @submit.prevent="login">
                                     <div class="form-group-row my-3">
                                         <input type="text" v-model="username" placeholder="Username" class="form-control">
                                     </div>
                                     <div class="form-group-row my-3">
-                                        <button @click="login" class="btn btn-primary d-block w-100">Login</button>
+                                        <button class="btn btn-primary d-block w-100">Login</button>
                                     </div>
                                 </form>
                             </div>
@@ -70,14 +70,23 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha512-v8ng/uGxkge3d1IJuEo6dJP8JViyvms0cly9pnbfRxT6/31c3dRWxIiwGnMSWwZjHKOuY3EVmijs7k1jz/9bLA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- classic vue is in here -->
     <script>
+        var socket = io.connect();    // socket is defined
         new Vue({
             el: "#app",
             data:{
-                session:false,    // giriş yapıldıysa göster
-                username: ""
+                session:false,    // if user is logined, v-if session will be show
+                username: "",
+                users: []
+            },
+            mounted:function(){
+                var obj = this;
+                socket.on("users", (users)=>{
+                    console.log(users);
+                    obj.users = users
+                })
             },
             methods:{
                 login(){
@@ -85,6 +94,7 @@
                         alert("Username field is required");
                     }else{
                         this.session = true
+                        socket.emit("newUser", this.username);     // to send server
                     }
                 }
             }
