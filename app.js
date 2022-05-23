@@ -4,6 +4,7 @@ var http = require("http").createServer(app);
 
 var io = require("socket.io")(http);
 var users = [];
+var messages = [];
 app.get("/", (req, res) => {
     //res.send("<h1>Chat System</h1>");
     res.sendFile(__dirname+"/index.html");
@@ -19,6 +20,12 @@ io.on("connection", (socket) => {
             name: userName
         });
         io.emit("users", users);
+    });
+    socket.on("sendMessageClient", (info)=>{      // server will receive message from client
+        console.log(info);
+        messages.push(info);
+        console.log(messages);
+        io.emit("messagesServer", messages);
     })
 });
 

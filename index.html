@@ -40,9 +40,16 @@
                         <div class="card-header">
                             <h4 class="text-primary">Chat System with Nodejs Socket.io and Vuejs</h4>
                         </div>
-                    </div>
-                    <div id="chat">
-
+                        <div id="chat" class="card-body">
+                        </div>
+                        <form @submit.prevent="sendMessage()">
+                            <div class="input-group">
+                                <input v-model="message" type="text" placeholder="Message" class="form-control">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary">Send</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -79,14 +86,19 @@
             data:{
                 session:false,    // if user is logined, v-if session will be show
                 username: "",
-                users: []
+                users: [],
+                message: "",
+                messages: []
             },
             mounted:function(){
                 var obj = this;
                 socket.on("users", (users)=>{
                     console.log(users);
                     obj.users = users
-                })
+                });
+                socket.on("messagesServer", (messages)=>{
+                    obj.messages = messages;
+                });
             },
             methods:{
                 login(){
@@ -96,6 +108,15 @@
                         this.session = true
                         socket.emit("newUser", this.username);     // to send server
                     }
+                },
+                sendMessage(){
+                    var message = this.message;
+                    var sender = this.username;
+                    var info = {
+                        sender: sender,
+                        message: message
+                    };
+                    socket.emit("sendMessageClient", info);      // The client is sending the message. The server will receive the message.
                 }
             }
        
